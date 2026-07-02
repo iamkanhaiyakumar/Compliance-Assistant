@@ -37,7 +37,13 @@ An AI-powered, enterprise-grade security and compliance auditor designed to scan
    - [Download Tesseract for Windows](https://github.com/UB-Mannheim/tesseract/wiki) and add it to your system PATH.
    - If Tesseract is not installed, the app will run perfectly but disable scanned PDF scanning with a warning.
 
-6. **Run the Streamlit Dashboard**:
+6. **Configure Environment Variables**:
+   Open the generated [.env](file:///.env) file in the root folder and configure your keys. The app runs on **Groq** by default:
+   ```env
+   GROQ_API_KEY=your_free_groq_api_key
+   ```
+
+7. **Run the Streamlit Dashboard**:
    ```bash
    streamlit run app.py
    ```
@@ -84,11 +90,13 @@ The system uses a modular, layered python design:
 
 ### Components:
 - **`parsers.py`**: Extracts text from PDFs (using `pdfplumber`), CSVs (using `pandas`), and plain text. Implements PyMuPDF pixmap rendering to feed Tesseract for OCR if scanned pages are detected.
-- **`detector.py`**: Executes regex and entropy scans. Employs a local **spaCy NER** model (`en_core_web_sm`) to flag Person Names, Organizations, and locations. Connects to OpenAI or Gemini for context verification and business strategic leaks.
+- **`detector.py`**: Executes regex and entropy scans. Employs a local **spaCy NER** model (`en_core_web_sm`) to flag Person Names, Organizations, and locations. Connects to OpenAI, Gemini, Groq, or Hugging Face for context verification and business strategic leaks.
 - **`compliance.py`**: Formulates weighted risk scores, maps findings to GDPR, PCI DSS, DPDP, and ISO 27001, and issues priority remediation steps.
 - **`redactor.py`**: Replaces sensitive data with tags in text files, and burns permanent black rectangular redactions on PDFs using PyMuPDF coordinate indexes.
 - **`qa_engine.py`**: Splits document text into overlapping chunks, creates vectors using Sentence-Transformers, indexes them in a **FAISS** vector store, and triggers RAG chat.
-- **`audit.py`**: Hahses uploaded files with SHA-256 to handle caching inside a SQLite database. Records session logs to a secure audit file.
+- **`audit.py`**: Hashes uploaded files with SHA-256 to handle caching inside a SQLite database. Records session logs to a secure audit file.
+- **`style.css`**: Contains premium glassmorphic layout definitions and CSS media queries for phone/minimization resizing.
+- **`header_template.html`**: Premium gradient header layout.
 
 ---
 
@@ -123,6 +131,12 @@ We combine fast deterministic engines (regex, Luhn checksums) with machine learn
    Standard HTML line breaks (`<br>`) crashed ReportLab's paragraph parser. Resolved by rewriting them as self-closing `<br/>` tags to comply with report formatting engines.
 3. **OCR Native Dependency Limitations**:
    Binary dependencies for poppler and pdf2image proved highly fragile on Windows environments. Resolved by leveraging PyMuPDF page pixmap rendering directly, removing extra binary requirements.
+4. **Cloud Environment Permissions (spaCy OSError)**:
+   Deploying to Streamlit Community Cloud threw an `OSError: Permission denied` when the runtime attempted to dynamically download and install the `en_core_web_sm` model wheel into the global virtualenv's `site-packages`. Resolved by specifying the wheel URL directly as a dependency in `requirements.txt` to trigger pre-build installation.
+5. **Transformers Dependency Scans (`torchvision`)**:
+   Streamlit's internal watcher scanned imported Hugging Face modules, causing a cascade of log warnings and `ModuleNotFoundError: No module named 'torchvision'`. Resolved by adding `torchvision` explicitly to `requirements.txt`.
+6. **Responsive UI & Window Resizing**:
+   Minimizing the browser screen squished the metric cards and caused tabs to wrap into multiple vertical lines. Resolved by separating styling into external `style.css` and `header_template.html` structures, implementing CSS media queries (`@media`), and forcing a horizontal, touch-scrollable flex layout on tabs.
 
 ---
 
@@ -138,5 +152,5 @@ We combine fast deterministic engines (regex, Luhn checksums) with machine learn
 ---
 
 ## 🌐 6. Working Prototype Deployment Link
-- **Deployment URL**: [https://sensitive-data-detection-compliance-assistant.streamlit.app](https://sensitive-data-detection-compliance-assistant.streamlit.app) *(Link to staging/production build)*
+- **Deployment URL**: [https://sensitive-data-detection-compliance-assistant.streamlit.app/](https://sensitive-data-detection-compliance-assistant.streamlit.app/)
 - **Demo Video**: [Link to 3-Minute Demo Video](https://youtube.com/watch?v=demo-video-link) *(Walkthrough of dashboard, OCR scans, PDF highlights, and compliance exports)*
