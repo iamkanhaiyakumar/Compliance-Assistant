@@ -1,0 +1,24 @@
+Subject: Internal Security Audit and Developer Configurations
+
+Hi Team,
+Here are the credential configs and contact updates from yesterday's migration.
+
+1. General Support Contact:
+- Coordinator Name: Rajeev Sharma
+- Email: rajeev.sharma@example.co.in
+- Direct Mobile: +91 98765 43210 (Alternate: 08765432109)
+
+2. Critical System Credentials (TO BE MOVED TO SECRET MANAGER IMMEDIATELY):
+- Production OpenAI Key: sk-proj-A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8S9t0U1v2W3
+- Backup Dev API Token: gsk_dev_secret_token_90210_xyz_alpha_omega_entropy_12345
+- Encryption password seed: hash_salt_value_entropy_998877
+
+3. User Compliance Records for Verification:
+- User Profile 1: Sunita Patel
+- Aadhaar Number: 5432 9012 3456
+- PAN Card: ABCDE1234F
+
+Please verify the above data feeds and purge this email log when complete.
+
+Best Regards,
+SecOps Team
