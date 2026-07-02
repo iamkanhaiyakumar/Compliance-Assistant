@@ -128,98 +128,13 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Inject Premium Dark Glassmorphism Styling
-st.markdown("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
-    
-    /* Background adjustments */
-    .stApp {
-        background-color: #0b0e14;
-        color: #cbd5e1;
-        font-family: 'Inter', sans-serif;
-    }
-    
-    /* Sidebar adjustments */
-    section[data-testid="stSidebar"] {
-        background-color: #11151d !important;
-        border-right: 1px solid #1e293b;
-    }
-    
-    /* Premium card styles with hover animations */
-    .dashboard-card {
-        background: rgba(30, 41, 59, 0.45);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 15px;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    }
-    
-    .dashboard-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 30px rgba(59, 130, 246, 0.15);
-        border: 1px solid rgba(59, 130, 246, 0.35);
-    }
-    
-    .metric-value {
-        font-family: 'Outfit', sans-serif;
-        font-size: 2.2rem;
-        font-weight: 800;
-        color: #ffffff;
-        margin-bottom: 2px;
-    }
-    
-    .metric-label {
-        font-family: 'Inter', sans-serif;
-        font-size: 0.85rem;
-        color: #94a3b8;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-    }
-    
-    /* Highlighting styling for regulatory violations */
-    .violation-GDPR {
-        border-left: 4px solid #3b82f6;
-        padding-left: 12px;
-        background: rgba(59, 130, 246, 0.05);
-        border-radius: 4px;
-        margin-bottom: 8px;
-        padding-top: 6px;
-        padding-bottom: 6px;
-    }
-    
-    .violation-PCIDSS {
-        border-left: 4px solid #ef4444;
-        padding-left: 12px;
-        background: rgba(239, 68, 68, 0.05);
-        border-radius: 4px;
-        margin-bottom: 8px;
-        padding-top: 6px;
-        padding-bottom: 6px;
-    }
-    
-    /* Custom headers styling */
-    h1, h2, h3, h4, h5, h6 {
-        font-family: 'Outfit', sans-serif !important;
-        font-weight: 700 !important;
-        color: #ffffff !important;
-    }
-    
-    /* Styled search matches */
-    .search-match {
-        background-color: rgba(234, 179, 8, 0.45);
-        border-bottom: 2px solid #eab308;
-        border-radius: 2px;
-        padding: 1px 2px;
-        color: #ffffff;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# Load Premium CSS Styles from file
+try:
+    with open("style.css", "r", encoding="utf-8") as f:
+        css_content = f.read()
+    st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
+except Exception as e:
+    st.warning("Failed to load external CSS styling file.")
 
 # ---------------------------------------------------------
 # Sidebar Configuration
@@ -229,16 +144,40 @@ st.sidebar.title("Compliance Assistant")
 st.sidebar.caption("AI-Powered Sensitive Data Detection & Audit Suite")
 
 st.sidebar.subheader("🔒 Key Configurations")
-api_provider = st.sidebar.selectbox("LLM Provider", ["Gemini", "OpenAI"])
-
-# Check environment for default key
-default_key = os.getenv("GEMINI_API_KEY") if api_provider == "Gemini" else os.getenv("OPENAI_API_KEY")
-api_key = st.sidebar.text_input(
-    f"{api_provider} API Key",
-    value=default_key or "",
-    type="password",
-    help=f"Used for context-aware validation, recommendations, and Document QA Chat."
+use_paid = st.sidebar.toggle(
+    "Use Paid Models (Gemini/OpenAI)", 
+    value=False, 
+    help="Enable this to override the default free Groq scanner with a paid API key."
 )
+
+if use_paid:
+    api_provider = st.sidebar.selectbox("Paid LLM Provider", ["Gemini", "OpenAI"])
+    default_key = os.getenv("GEMINI_API_KEY") if api_provider == "Gemini" else os.getenv("OPENAI_API_KEY")
+    api_key = st.sidebar.text_input(
+        f"{api_provider} API Key",
+        value=default_key or "",
+        type="password",
+        help="Used for context-aware validation, recommendations, and Document QA Chat."
+    )
+else:
+    api_provider = "Groq"
+    # Load Groq key from environment
+    groq_env_key = os.getenv("GROQ_API_KEY")
+    
+    if groq_env_key:
+        api_key = groq_env_key
+        st.sidebar.success("⚡ Running on Free & Fast Groq Engine (Key loaded from env)")
+    else:
+        api_key = st.sidebar.text_input(
+            "Groq API Key (Paste here if not in .env)",
+            value="",
+            type="password",
+            help="Get your free key from console.groq.com"
+        )
+        if api_key:
+            st.sidebar.success("⚡ Running on Free & Fast Groq Engine")
+        else:
+            st.sidebar.info("💡 Get a free API key at console.groq.com to enable AI features, or toggle to Paid Models.")
 
 scan_depth = st.sidebar.radio(
     "Scan Depth Mode",
@@ -254,28 +193,13 @@ if "vector_stores" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = {}
 
-# ---------------------------------------------------------
-# Premium Glassmorphism Header
-# ---------------------------------------------------------
-st.markdown("""
-    <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%); 
-                padding: 30px; border-radius: 16px; margin-bottom: 30px; 
-                border: 1px solid rgba(255,255,255,0.08); 
-                box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.4); 
-                backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
-        <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
-            <img src="https://img.icons8.com/nolan/96/shield.png" width="80" style="filter: drop-shadow(0px 0px 10px rgba(59,130,246,0.3));" />
-            <div>
-                <h1 style="margin: 0; font-size: 2.3rem; color: #ffffff; font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -0.5px;">
-                    Sensitive Data Detection & Compliance Suite
-                </h1>
-                <p style="margin: 6px 0 0 0; color: #94a3b8; font-size: 1.1rem; font-family: 'Inter', sans-serif; font-weight: 400; line-height: 1.5;">
-                    Secure, multi-engine auditing suite for personal, financial, and business data privacy checks (GDPR, PCI DSS, DPDP).
-                </p>
-            </div>
-        </div>
-    </div>
-""", unsafe_allow_html=True)
+# Load Premium Header Banner from HTML file
+try:
+    with open("header_template.html", "r", encoding="utf-8") as f:
+        header_html = f.read()
+    st.markdown(header_html, unsafe_allow_html=True)
+except Exception as e:
+    pass
 
 # ---------------------------------------------------------
 # Document Upload Form
@@ -740,6 +664,10 @@ if st.session_state.scan_history:
             with st.chat_message("user"):
                 st.write(user_query)
             st.session_state.messages[active_hash].append({"role": "user", "content": user_query})
+            
+            # Lazy initialize vector store if missing from session state
+            if active_hash not in st.session_state.vector_stores:
+                st.session_state.vector_stores[active_hash] = DocVectorStore(active_doc["text_content"])
             
             # Run QA retrieval & answer generation
             with st.spinner("AI Copilot is reviewing document index..."):

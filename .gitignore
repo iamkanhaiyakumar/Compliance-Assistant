@@ -1,0 +1,40 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Caching and Logging (Compliance Data)
+*.db
+*.log
+compliance_audit.log
+scan_cache.db
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+pyenv/
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Local configurations
+.env
+.env.local
+.env.development
+.env.production
+
+# Test artifacts generated during validation
+test_files/

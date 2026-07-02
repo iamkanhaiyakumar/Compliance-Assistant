@@ -5,6 +5,7 @@ import json
 import google.generativeai as genai
 from openai import OpenAI
 import spacy
+import requests
 
 # ---------------------------------------------------------
 # Self-healing spaCy model loading
@@ -375,6 +376,29 @@ def run_llm_hybrid_scan(text: str, regex_spacy_findings: list[dict], api_key: st
                 ]
             )
             llm_output = chat_completion.choices[0].message.content
+        elif provider == "Groq":
+            client = OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
+            chat_completion = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[
+                    {"role": "system", "content": "You are a secure, JSON-only returning compliance parser."},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            llm_output = chat_completion.choices[0].message.content
+        elif provider == "Hugging Face":
+            headers = {"Authorization": f"Bearer {api_key}"}
+            api_url = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"
+            payload = {
+                "inputs": f"<s>[INST] {prompt} [/INST]",
+                "parameters": {"max_new_tokens": 1024, "return_full_text": False}
+            }
+            response = requests.post(api_url, headers=headers, json=payload)
+            res_json = response.json()
+            if isinstance(res_json, list):
+                llm_output = res_json[0].get("generated_text", "")
+            else:
+                llm_output = res_json.get("generated_text", "")
     except Exception as e:
         # Fall back to regex/spacy without verification if LLM fails
         return regex_spacy_findings

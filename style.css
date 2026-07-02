@@ -1,0 +1,228 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
+
+/* Main App Wrapper Styling */
+.stApp {
+    background-color: #0b0e14;
+    color: #cbd5e1;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* Sidebar Custom Styling */
+section[data-testid="stSidebar"] {
+    background-color: #0f131a !important;
+    border-right: 1px solid #1e293b;
+}
+
+section[data-testid="stSidebar"] .stMarkdown {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Premium Card Layouts with Hover Glow Transitions */
+.dashboard-card {
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.35);
+    background: rgba(30, 41, 59, 0.55);
+}
+
+/* Metrics and Text Headers inside Cards */
+.metric-value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 2px;
+    letter-spacing: -0.5px;
+}
+
+.metric-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Regulatory Compliance Badges */
+.violation-GDPR {
+    border-left: 4px solid #3b82f6;
+    padding: 10px 14px;
+    background: rgba(59, 130, 246, 0.05);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: #e2e8f0;
+}
+
+.violation-PCIDSS {
+    border-left: 4px solid #ef4444;
+    padding: 10px 14px;
+    background: rgba(239, 68, 68, 0.05);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: #e2e8f0;
+}
+
+/* General Typography Headers */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    letter-spacing: -0.3px;
+}
+
+/* Styled Search Matches */
+.search-match {
+    background-color: rgba(234, 179, 8, 0.45);
+    border-bottom: 2.5px solid #eab308;
+    border-radius: 3px;
+    padding: 1px 3px;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+/* Styled Tabs in Streamlit - Forces horizontal scroll & no wrapping */
+div[data-baseweb="tab-list"] {
+    background-color: #0f131a;
+    border-radius: 8px;
+    padding: 4px;
+    border: 1px solid #1e293b;
+    margin-bottom: 20px;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbar for Tab list to maintain premium layout */
+div[data-baseweb="tab-list"]::-webkit-scrollbar {
+    display: none;
+}
+
+button[data-baseweb="tab"] {
+    color: #94a3b8 !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    padding: 8px 16px !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+    border: none !important;
+    background-color: transparent !important;
+    white-space: nowrap !important; /* Forces tab text to stay on one line */
+}
+
+button[data-baseweb="tab"][aria-selected="true"] {
+    color: #ffffff !important;
+    background-color: #1e293b !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Responsive Header Banner Styles */
+.header-banner {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%); 
+    padding: 30px; 
+    border-radius: 16px; 
+    margin-bottom: 30px; 
+    border: 1px solid rgba(255,255,255,0.08); 
+    box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.4); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.header-container {
+    display: flex; 
+    align-items: center; 
+    gap: 24px; 
+    flex-wrap: wrap;
+}
+
+.header-logo {
+    width: 80px;
+    filter: drop-shadow(0px 0px 10px rgba(59,130,246,0.3));
+}
+
+.header-title {
+    margin: 0; 
+    font-size: 2.3rem !important; 
+    color: #ffffff; 
+    font-family: 'Outfit', sans-serif; 
+    font-weight: 800; 
+    letter-spacing: -0.5px; 
+    line-height: 1.2;
+}
+
+.header-subtitle {
+    margin: 6px 0 0 0; 
+    color: #94a3b8; 
+    font-size: 1.1rem; 
+    font-family: 'Inter', sans-serif; 
+    font-weight: 400; 
+    line-height: 1.5;
+}
+
+/* CSS Media Queries for Responsive Resizing / Minimize Actions */
+@media (max-width: 768px) {
+    .header-banner {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .header-logo {
+        width: 60px;
+    }
+    .header-title {
+        font-size: 1.6rem !important;
+    }
+    .header-subtitle {
+        font-size: 0.95rem;
+    }
+    .metric-value {
+        font-size: 1.6rem !important;
+    }
+    .metric-label {
+        font-size: 0.75rem !important;
+        letter-spacing: 0.5px;
+    }
+    .dashboard-card {
+        padding: 14px !important;
+        margin-bottom: 12px !important;
+    }
+    /* Make tab font smaller on mobile to optimize space */
+    button[data-baseweb="tab"] {
+        font-size: 0.85rem !important;
+        padding: 6px 12px !important;
+    }
+}

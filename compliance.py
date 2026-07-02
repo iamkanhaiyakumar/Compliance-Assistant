@@ -2,6 +2,7 @@ import math
 import json
 import google.generativeai as genai
 from openai import OpenAI
+import requests
 
 # ---------------------------------------------------------
 # Risk Metrics Calculation
@@ -169,7 +170,7 @@ def generate_ai_recommendations(findings: list[dict], api_key: str, provider: st
             model = genai.GenerativeModel("gemini-1.5-flash")
             response = model.generate_content(prompt)
             output = response.text
-        else:
+        elif provider == "OpenAI":
             client = OpenAI(api_key=api_key)
             completion = client.chat.completions.create(
                 model="gpt-4o-mini",
@@ -179,6 +180,29 @@ def generate_ai_recommendations(findings: list[dict], api_key: str, provider: st
                 ]
             )
             output = completion.choices[0].message.content
+        elif provider == "Groq":
+            client = OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
+            completion = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[
+                    {"role": "system", "content": "You are a secure, JSON-only returning compliance planner."},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            output = completion.choices[0].message.content
+        elif provider == "Hugging Face":
+            headers = {"Authorization": f"Bearer {api_key}"}
+            api_url = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"
+            payload = {
+                "inputs": f"<s>[INST] {prompt} [/INST]",
+                "parameters": {"max_new_tokens": 1024, "return_full_text": False}
+            }
+            response = requests.post(api_url, headers=headers, json=payload)
+            res_json = response.json()
+            if isinstance(res_json, list):
+                output = res_json[0].get("generated_text", "")
+            else:
+                output = res_json.get("generated_text", "")
             
         # Parse JSON
         clean_str = output.strip()

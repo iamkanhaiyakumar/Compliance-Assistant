@@ -3,6 +3,7 @@ import faiss
 from sentence_transformers import SentenceTransformer
 import google.generativeai as genai
 from openai import OpenAI
+import requests
 
 # ---------------------------------------------------------
 # Local FAISS Indexing & Search
@@ -70,7 +71,7 @@ def ask_compliance_copilot(
     and prompts the LLM to answer the user's questions securely.
     """
     if not api_key:
-        return "Please configure your Gemini or OpenAI API Key in the sidebar to chat with the document."
+        return "Please configure your LLM API Key in the sidebar to chat with the document."
         
     if not vector_store or not vector_store.chunks:
         return "No document text available. Please upload a file first."
@@ -119,7 +120,7 @@ def ask_compliance_copilot(
             model = genai.GenerativeModel("gemini-1.5-flash")
             response = model.generate_content(prompt)
             return response.text
-        else:
+        elif provider == "OpenAI":
             client = OpenAI(api_key=api_key)
             completion = client.chat.completions.create(
                 model="gpt-4o-mini",
@@ -129,5 +130,28 @@ def ask_compliance_copilot(
                 ]
             )
             return completion.choices[0].message.content
+        elif provider == "Groq":
+            client = OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
+            completion = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[
+                    {"role": "system", "content": "You are a secure, context-abiding compliance consultant."},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            return completion.choices[0].message.content
+        elif provider == "Hugging Face":
+            headers = {"Authorization": f"Bearer {api_key}"}
+            api_url = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"
+            payload = {
+                "inputs": f"<s>[INST] {prompt} [/INST]",
+                "parameters": {"max_new_tokens": 1024, "return_full_text": False}
+            }
+            response = requests.post(api_url, headers=headers, json=payload)
+            res_json = response.json()
+            if isinstance(res_json, list):
+                return res_json[0].get("generated_text", "")
+            else:
+                return res_json.get("generated_text", "")
     except Exception as e:
         return f"AI Copilot Error: Failed to generate response ({str(e)})."
