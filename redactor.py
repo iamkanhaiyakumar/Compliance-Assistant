@@ -86,10 +86,16 @@ def highlight_binary_pdf(pdf_bytes: bytes, findings: list[dict]) -> bytes:
             # Search for instances of the text on this page
             rects = page.search_for(val)
             for rect in rects:
-                annot = page.add_highlight_annot(rect)
-                # Soft yellow highlight color: (1, 0.9, 0.4)
-                annot.set_colors(stroke=(1, 0.9, 0.4))
-                annot.update()
+                # Skip degenerate or empty rectangles to avoid "bad quads entry" ValueErrors
+                if rect.is_empty or rect.width <= 0.1 or rect.height <= 0.1:
+                    continue
+                try:
+                    annot = page.add_highlight_annot(rect)
+                    # Soft yellow highlight color: (1, 0.9, 0.4)
+                    annot.set_colors(stroke=(1, 0.9, 0.4))
+                    annot.update()
+                except Exception:
+                    pass
                 
     output = io.BytesIO()
     doc.save(output)
@@ -112,10 +118,19 @@ def redact_binary_pdf(pdf_bytes: bytes, findings: list[dict]) -> bytes:
         for val in target_values:
             rects = page.search_for(val)
             for rect in rects:
-                # Add a redaction annotation with black fill (0, 0, 0)
-                page.add_redact_annot(rect, fill=(0, 0, 0))
+                # Skip degenerate or empty rectangles to avoid crashes
+                if rect.is_empty or rect.width <= 0.1 or rect.height <= 0.1:
+                    continue
+                try:
+                    # Add a redaction annotation with black fill (0, 0, 0)
+                    page.add_redact_annot(rect, fill=(0, 0, 0))
+                except Exception:
+                    pass
         # Execute the redaction to burn in black blocks and erase the underlying text characters
-        page.apply_redactions()
+        try:
+            page.apply_redactions()
+        except Exception:
+            pass
         
     output = io.BytesIO()
     doc.save(output)

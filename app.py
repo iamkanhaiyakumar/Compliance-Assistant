@@ -131,58 +131,92 @@ st.set_page_config(
 # Inject Premium Dark Glassmorphism Styling
 st.markdown("""
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
+    
     /* Background adjustments */
     .stApp {
-        background-color: #0d0f14;
-        color: #e2e8f0;
+        background-color: #0b0e14;
+        color: #cbd5e1;
+        font-family: 'Inter', sans-serif;
     }
     
     /* Sidebar adjustments */
     section[data-testid="stSidebar"] {
-        background-color: #161a22 !important;
-        border-right: 1px solid #2d3748;
+        background-color: #11151d !important;
+        border-right: 1px solid #1e293b;
     }
     
-    /* Custom card styles */
+    /* Premium card styles with hover animations */
     .dashboard-card {
         background: rgba(30, 41, 59, 0.45);
-        backdrop-filter: blur(8px);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
-        padding: 18px;
+        border-radius: 12px;
+        padding: 20px;
         margin-bottom: 15px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(59, 130, 246, 0.15);
+        border: 1px solid rgba(59, 130, 246, 0.35);
     }
     
     .metric-value {
+        font-family: 'Outfit', sans-serif;
         font-size: 2.2rem;
-        font-weight: 700;
-        color: #f8fafc;
+        font-weight: 800;
+        color: #ffffff;
         margin-bottom: 2px;
     }
     
     .metric-label {
-        font-size: 0.9rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.85rem;
         color: #94a3b8;
-        font-weight: 500;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.8px;
     }
     
-    /* Highlighting styling for dashboard explainers */
-    .violation-GDPR { border-left: 4px solid #3b82f6; padding-left: 10px; }
-    .violation-PCIDSS { border-left: 4px solid #ef4444; padding-left: 10px; }
+    /* Highlighting styling for regulatory violations */
+    .violation-GDPR {
+        border-left: 4px solid #3b82f6;
+        padding-left: 12px;
+        background: rgba(59, 130, 246, 0.05);
+        border-radius: 4px;
+        margin-bottom: 8px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+    }
+    
+    .violation-PCIDSS {
+        border-left: 4px solid #ef4444;
+        padding-left: 12px;
+        background: rgba(239, 68, 68, 0.05);
+        border-radius: 4px;
+        margin-bottom: 8px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+    }
     
     /* Custom headers styling */
-    h1, h2, h3 {
-        font-family: 'Outfit', 'Inter', sans-serif !important;
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Outfit', sans-serif !important;
         font-weight: 700 !important;
-        color: #f8fafc !important;
+        color: #ffffff !important;
     }
     
     /* Styled search matches */
     .search-match {
-        background-color: rgba(234, 179, 8, 0.4);
+        background-color: rgba(234, 179, 8, 0.45);
         border-bottom: 2px solid #eab308;
+        border-radius: 2px;
+        padding: 1px 2px;
+        color: #ffffff;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -219,6 +253,29 @@ if "vector_stores" not in st.session_state:
     st.session_state.vector_stores = {}
 if "messages" not in st.session_state:
     st.session_state.messages = {}
+
+# ---------------------------------------------------------
+# Premium Glassmorphism Header
+# ---------------------------------------------------------
+st.markdown("""
+    <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%); 
+                padding: 30px; border-radius: 16px; margin-bottom: 30px; 
+                border: 1px solid rgba(255,255,255,0.08); 
+                box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.4); 
+                backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+        <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+            <img src="https://img.icons8.com/nolan/96/shield.png" width="80" style="filter: drop-shadow(0px 0px 10px rgba(59,130,246,0.3));" />
+            <div>
+                <h1 style="margin: 0; font-size: 2.3rem; color: #ffffff; font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -0.5px;">
+                    Sensitive Data Detection & Compliance Suite
+                </h1>
+                <p style="margin: 6px 0 0 0; color: #94a3b8; font-size: 1.1rem; font-family: 'Inter', sans-serif; font-weight: 400; line-height: 1.5;">
+                    Secure, multi-engine auditing suite for personal, financial, and business data privacy checks (GDPR, PCI DSS, DPDP).
+                </p>
+            </div>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # Document Upload Form
